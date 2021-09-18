@@ -4,9 +4,10 @@ const mongoose = require("mongoose")
 const dotenv = require("dotenv");
 const authRoute = require("./routes/auth-route");
 dotenv.config();
+require("./config/passport");
 
 mongoose.connect(
-    "mongodb+srv://howardmui:howardmui0209@cluster0.jh0rl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+    process.env.DB_CONNECT,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true,

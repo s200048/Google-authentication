@@ -3,12 +3,23 @@ const passport = require("passport");
 
 router.get("/login", (req,res) => {
     res.render("login");
+    // console.log(process.env.GOOGLE_CLIENT_ID);
+    // console.log(process.env.GOOGLE_CLIENT_SECRET);
 });
 
-router.get("/google", (req,res) =>{
-    passport.authenticate("google", {
-        scope: ["profile"],         //authenticate user後，想拎到user info.
-    });
-});
+//rewrite
+// router.get("/google", (req,res) =>{
+//     passport.authenticate("google", {
+//         scope: ["profile"],         //authenticate user後，想拎到user info.
+//     });
+// });
+
+router.get(
+    "/google", 
+    // 呢個係middleware --> 唔用req,res
+    passport.authenticate("google", {       //呢到會去返passport.js 睇下有冇googleStrategy，再睇.env 果啲value
+        scope: ["profile"],
+    })
+);
 
 module.exports = router;
