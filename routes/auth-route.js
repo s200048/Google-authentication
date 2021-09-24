@@ -7,10 +7,16 @@ const passport = require("passport");
 // });
 
 router.get("/login", (req,res) => {
-    res.render("login");
+    res.render("login", {user: req.user});
     // console.log(process.env.GOOGLE_CLIENT_ID);
     // console.log(process.env.GOOGLE_CLIENT_SECRET);
 });
+
+//
+router.get("/logout", (req,res) => {
+    req.logOut();
+    res.redirect("/");
+})
 
 //rewrite
 // router.get("/google", (req,res) =>{
@@ -19,16 +25,19 @@ router.get("/login", (req,res) => {
 //     });
 // });
 
-router.get(
-    "/google", 
-    // 呢個係middleware --> 唔用req,res
-    passport.authenticate("google", {       //呢到會去返passport.js 睇下有冇googleStrategy，再睇.env 果啲value
-        scope: ["profile"],
+router.get("/google", 
+    // 呢個係middleware(only for this route) --> 唔用req,res
+    //呢到會去返passport.js 睇下有冇googleStrategy，再睇.env 果啲value
+    passport.authenticate("google", {
+        scope: ["profile", "email"],
+        prompt: "select_account",
     })
 );
 
-router.get("/google/redirect", passport.authenticate("google"), (req,res) => {
-    res.redirect("/profile");
-});
+router.get("/google/redirect", passport.authenticate("google", {failureRedirect: "/login"}), 
+    (req,res) => {
+        res.redirect("/profile");
+    }
+);
 
 module.exports = router;
