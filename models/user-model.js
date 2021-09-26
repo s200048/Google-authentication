@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
 
   //local login
   email: { type: String },
-  password: { type: String, maxLength: 1024}, //因為一陣辰set 佢做hash，所以一定要夠長
+  password: { type: String, maxLength: 1024}, //因為一陣要set 佢做hash，所以一定要夠長
 });
 
 const User = mongoose.model("User", userSchema);
