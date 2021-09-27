@@ -19,7 +19,75 @@ router.get("/signup", (req,res) => {
     res.render("signup", {user: req.user});
 });
 
+
+// by promise object .then .catch (by josphe)
 // router.post("/signup", (req,res,next) => {
+
+//     const newUser = req.body;
+//     const {name, email, password} = newUser;
+
+//     console.log("Find user");
+//     User.findOne({email: email}).then((user) => {
+//             if(user) {
+//                 console.log("Found user")
+//                 console.log(`This ID is already existed in MongoDB.`);
+//                 res.redirect("signup");
+//             } else {
+//                 console.log("Cannot find user");
+//                 console.log("Begin to hash");
+//                 bcrypt.hash(password, 10).then((newPw) => {
+//                     console.log("Hashed password");
+//                     const uesrToCreate = new User({
+//                         name: name,
+//                         email: email,
+//                         password: newPw,
+//                     })
+//                     console.log("save user")
+//                     uesrToCreate.save().then((newSavedUser) => {
+//                         console.log("Saved user: ", newSavedUser);
+//                         console.log(`This user was saved in MongoDb now.`);
+                        
+//                         res.redirect("/profile");
+//                     }).catch((err) => { 
+//                         console.log(err);
+//                         res.redirect("/")
+//                     });
+//                 })
+//             }
+//     })
+// })
+
+
+//by async await function(by myself)
+router.post("/signup", async(req,res) => {
+    let {name, email, password} = req.body;
+    
+    // Begin to found user
+    let foundUser = await User.findOne({email});
+    if(foundUser){
+        // Found User
+        req.flash("error_msg", "Email has already been registered.")
+        res.redirect("/auth/signup");
+        console.log("User existed.");
+    } else{
+        // User not find
+        // hash password
+        let newPw = await bcrypt.hash(password, 10);
+        //save User
+        let newUser = new User({name: name, email: email, password: newPw,});
+        try {
+            await newUser.save();
+            req.flash("success_msg", "Registration succeeds. You can login now.")
+            console.log("user saved.")
+            res.redirect("/auth/signup");
+        } catch(err){
+            console.log(err);
+        }
+    }
+})
+
+// Wrong code --> Not sequence code
+
 //     let newUser = req.body;
 //     bcrypt.hash(newUser.password, 10, (err, hash) => {
 //         if(err) {
@@ -55,29 +123,35 @@ router.get("/signup", (req,res) => {
 //     console.log("This is Two");
 // })
 
-router.post("/signup", async(req,res) => {
-    let { name, email, password } = req.body;
-    const emailExist = await User.findOne({email});
-    if (emailExist) return res.status(400).send("Email already exist.")
+// const a = async () => {
 
-    const hash = await bcrypt.hash(password, 10);
-    password = hash;
-    let newUser = new User({name, email, password});
+// }
 
-    console.log("This is one");
-    try {
-        console.log("This is two.");
-        const savedUser = await newUser.save();
-        res.status(200).send({
-            msg:"User saved.",
-            savedObj: savedUser,
-        });
-        console.log(savedUser);
-    } catch (err) {
-        res.status(400).send(err);
-    }
-    console.log("This is three.");
-})
+// Wilson async code
+
+// router.post("/signup", async(req,res) => {
+//     let { name, email, password } = req.body;
+//     const emailExist = await User.findOne({email});
+//     if (emailExist) return res.status(400).send("Email already exist.")
+
+//     const hash = await bcrypt.hash(password, 10);
+//     password = hash;
+//     let newUser = new User({name, email, password});
+
+//     console.log("This is one");
+//     try {
+//         console.log("This is two.");
+//         const savedUser = await newUser.save();
+//         res.status(200).send({
+//             msg:"User saved.",
+//             savedObj: savedUser,
+//         });
+//         console.log(savedUser);
+//     } catch (err) {
+//         res.status(400).send(err);
+//     }
+//     console.log("This is three.");
+// })
 
 
 // Logout

@@ -1,6 +1,5 @@
 const passport = require("passport");
 const googleStrategy = require("passport-google-oauth20");
-// const { deleteOne } = require("../models/user-model");
 const User = require("../models/user-model");
 
 passport.serializeUser((user, done) => {
@@ -40,6 +39,7 @@ passport.use(
                         name: profile.displayName,
                         googleID: profile.id,
                         thumbnail: profile.photos[0].value,
+                        email: profile.emails[0].value,
                     }).save().then((newUser) => {
                         console.log("Saved message: ", newUser);
                         console.log(`Saved this user in MongoDb now.`);
