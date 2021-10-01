@@ -1,5 +1,7 @@
 const passport = require("passport");
 const googleStrategy = require("passport-google-oauth20");
+const localStrategy = require("passport-local");
+const bcrypt = require("bcrypt");
 const User = require("../models/user-model");
 
 passport.serializeUser((user, done) => {
@@ -21,6 +23,7 @@ passport.deserializeUser((_id, done) => {
     });
 });
 
+// Google Strategy
 passport.use(
     new googleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
@@ -54,3 +57,66 @@ passport.use(
         }
     )    
 );
+
+
+//Local Stragety (by myself with async)
+// passport.use(
+//     new localStrategy(
+//         async (email, password, done) => {
+//             let foundUser = await User.findOne({email: email});
+//             console.log("Found user.", foundUser);
+//             try{
+//                 if (!foundUser){
+//                     console.log("email not exist");
+//                     return done(null, false, { message: 'Incorrect username.' });
+//                 } else {
+//                     console.log("email exist.");
+
+//                     let notHash = await bcrypt.compare(password, foundUser.password);
+//                     console.log("Not hash password: ",notHash);
+//                     if (notHash === true) {
+//                         console.log("user pw correct.");
+//                         return done(null, foundUser);
+//                     } else {
+//                         console.log("user password fail.");
+//                         return done(null, false, { message: 'Incorrect password.' });
+//                     }
+//                 }
+//             } catch(err) {
+//                 console.log(err);
+//                 console.log("Something go wrong.");
+//             }
+//         }
+//     )
+// )
+
+// by .then
+
+passport.use(
+    new localStrategy(
+        (username, pw, done) => {
+            User.findOne({email: username})
+            .then((foundUser) => {
+                console.log("Found User.")
+                if(!foundUser){
+                    console.log("User not exist.")
+                    return done(null, false);
+                }
+                bcrypt.compare(pw, foundUser.password).then((comHash) => {
+                    console.log("Dehash pw.")
+                    if(comHash === true){
+                        console.log("pw correct.")
+                        return done(null, foundUser);
+                    } else{
+                        console.log("pw fault.")
+                        return done(null, false);
+                    }
+                }).catch((err) => {
+                    console.log(err())
+                })
+            }).catch((err) => {
+                console.log(err);
+            })
+        }
+    )
+)

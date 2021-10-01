@@ -8,54 +8,24 @@ const bcrypt = require("bcrypt");
 //     next();
 // });
 
+//Login in
 router.get("/login", (req,res) => {
     res.render("login", {user: req.user});
     // console.log(process.env.GOOGLE_CLIENT_ID);
     // console.log(process.env.GOOGLE_CLIENT_SECRET);
 });
 
+router.post("/login", passport.authenticate("local", {failureRedirect: "/auth/login", 
+    failureFlash: "Wrong email or password." }), (req,res) => {
+        res.redirect("/profile");
+})
+
+
+
 //Sign up
 router.get("/signup", (req,res) => {
     res.render("signup", {user: req.user});
 });
-
-
-// by promise object .then .catch (by josphe)
-// router.post("/signup", (req,res,next) => {
-
-//     const newUser = req.body;
-//     const {name, email, password} = newUser;
-
-//     console.log("Find user");
-//     User.findOne({email: email}).then((user) => {
-//             if(user) {
-//                 console.log("Found user")
-//                 console.log(`This ID is already existed in MongoDB.`);
-//                 res.redirect("signup");
-//             } else {
-//                 console.log("Cannot find user");
-//                 console.log("Begin to hash");
-//                 bcrypt.hash(password, 10).then((newPw) => {
-//                     console.log("Hashed password");
-//                     const uesrToCreate = new User({
-//                         name: name,
-//                         email: email,
-//                         password: newPw,
-//                     })
-//                     console.log("save user")
-//                     uesrToCreate.save().then((newSavedUser) => {
-//                         console.log("Saved user: ", newSavedUser);
-//                         console.log(`This user was saved in MongoDb now.`);
-                        
-//                         res.redirect("/profile");
-//                     }).catch((err) => { 
-//                         console.log(err);
-//                         res.redirect("/")
-//                     });
-//                 })
-//             }
-//     })
-// })
 
 
 //by async await function(by myself)
@@ -81,10 +51,36 @@ router.post("/signup", async(req,res) => {
             console.log("user saved.")
             res.redirect("/auth/signup");
         } catch(err){
-            console.log(err);
+            // console.log(err.errors.name.properties.message);
+            req.flash("error_msg", err.errors.name.properties.message);
+            res.redirect("/auth/signup");
         }
     }
 })
+
+// Logout
+router.get("/logout", (req,res) => {
+    req.logOut();
+    res.redirect("/");
+})
+
+router.get("/google", 
+    // 呢個係middleware(only for this route) --> 唔用req,res
+    //呢到會去返passport.js 睇下有冇googleStrategy，再睇.env 果啲value
+    passport.authenticate("google", {
+        scope: ["profile", "email"],
+        prompt: "select_account",
+    })
+);
+
+router.get("/google/redirect", passport.authenticate("google", {failureRedirect: "/login"}), 
+    (req,res) => {
+        res.redirect("/profile");
+    }
+);
+
+module.exports = router;
+
 
 // Wrong code --> Not sequence code
 
@@ -154,13 +150,7 @@ router.post("/signup", async(req,res) => {
 // })
 
 
-// Logout
-router.get("/logout", (req,res) => {
-    req.logOut();
-    res.redirect("/");
-})
-
-//rewrite
+// need to rewrite
 // router.get("/google", (req,res) =>{
 //     passport.authenticate("google", {
 //         scope: ["profile"],         //authenticate user後，想拎到user info.
@@ -170,19 +160,39 @@ router.get("/logout", (req,res) => {
 
 
 
-router.get("/google", 
-    // 呢個係middleware(only for this route) --> 唔用req,res
-    //呢到會去返passport.js 睇下有冇googleStrategy，再睇.env 果啲value
-    passport.authenticate("google", {
-        scope: ["profile", "email"],
-        prompt: "select_account",
-    })
-);
+// by promise object .then .catch (by josphe)
+// router.post("/signup", (req,res,next) => {
 
-router.get("/google/redirect", passport.authenticate("google", {failureRedirect: "/login"}), 
-    (req,res) => {
-        res.redirect("/profile");
-    }
-);
+//     const newUser = req.body;
+//     const {name, email, password} = newUser;
 
-module.exports = router;
+//     console.log("Find user");
+//     User.findOne({email: email}).then((user) => {
+//             if(user) {
+//                 console.log("Found user")
+//                 console.log(`This ID is already existed in MongoDB.`);
+//                 res.redirect("signup");
+//             } else {
+//                 console.log("Cannot find user");
+//                 console.log("Begin to hash");
+//                 bcrypt.hash(password, 10).then((newPw) => {
+//                     console.log("Hashed password");
+//                     const uesrToCreate = new User({
+//                         name: name,
+//                         email: email,
+//                         password: newPw,
+//                     })
+//                     console.log("save user")
+//                     uesrToCreate.save().then((newSavedUser) => {
+//                         console.log("Saved user: ", newSavedUser);
+//                         console.log(`This user was saved in MongoDb now.`);
+                        
+//                         res.redirect("/profile");
+//                     }).catch((err) => { 
+//                         console.log(err);
+//                         res.redirect("/")
+//                     });
+//                 })
+//             }
+//     })
+// })
