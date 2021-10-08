@@ -45,11 +45,8 @@ app.use(flash());
 app.use((req,res,next) => {
     res.locals.success_msg = req.flash("success_msg");
     res.locals.error_msg = req.flash("error_msg");
+    // 呢個係passport local strategy 入邊嘅fail msg，會自動送入res.locals.error 入邊(係passport 專用))
     res.locals.error = req.flash("error");
-    // console.log("This is flash",req.flash);
-    // console.log(app.locals);
-    // console.log(res.locals.error_msg);
-
     next();
 });
 
@@ -63,19 +60,11 @@ app.use("/profile", profileRoute);
 // });
 
 
-
-
-
-
-
-
-
-
-
-
 //Home page
 app.get("/", (req,res) => {
     res.render("index", {user: req.user});
+    // console.log(req.session);
+    // console.log(req.originalUrl);
     // console.log(req.session.passport.user);
     // console.log(passport.user);//undefined
     // console.log(req.user);

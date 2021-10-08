@@ -108,7 +108,7 @@ passport.use(
                         console.log("pw correct.")
                         return done(null, foundUser);
                     } else{
-                        console.log("pw fault.")
+                        console.log("pw fail.")
                         return done(null, false);
                     }
                 }).catch((err) => {

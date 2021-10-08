@@ -20,8 +20,6 @@ router.post("/login", passport.authenticate("local", {failureRedirect: "/auth/lo
         res.redirect("/profile");
 })
 
-
-
 //Sign up
 router.get("/signup", (req,res) => {
     res.render("signup", {user: req.user});
@@ -78,6 +76,26 @@ router.get("/google/redirect", passport.authenticate("google", {failureRedirect:
         res.redirect("/profile");
     }
 );
+
+// post page
+router.get("/post", (req,res) => {
+    res.render("post", {user: req.user});
+})
+
+// router.post("/post", authCheck, async (req,res) => {
+//     let {title, content} = req.body;
+    
+//     let newPost = new Post({title,content: content, author: req.user._id});
+//     try {
+//         await newPost.save();
+//         res.redirect("/profile");
+//     } catch(err) {
+//         console.log(err);
+//         req.flash("error_msg", "Both title and content are required.");
+//         res.redirect("/post");
+//     }
+
+// })
 
 module.exports = router;
 
