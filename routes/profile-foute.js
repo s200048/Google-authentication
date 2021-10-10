@@ -3,8 +3,12 @@ const Post = require("../models/post-model");
 const User = require("../models/user-model");
 
 const authCheck = (req,res,next) =>{
-    console.log(req.isAuthenticated());
+    // console.log(req.isAuthenticated());
+    //想知未login 之前係想去邊
+    console.log(req.originalUrl);
+    
     if(!req.isAuthenticated()) {
+        req.session.returnTo = req.originalUrl;
         res.redirect("/auth/login");
         // console.log("Redirect to /");
     } else {
@@ -13,12 +17,15 @@ const authCheck = (req,res,next) =>{
     }
 }
 
-router.get("/", authCheck, (req,res) => {
-    res.render("profile", {user: req.user});
+router.get("/", authCheck, async (req,res) => {
+    // console.log(req.user._id);
+    let postFound = await Post.find({author: req.user._id});
+    // console.log(postFound);
+    res.render("profile", {user: req.user, post: postFound});
 });
 
 // post page
-router.get("/post", (req,res) => {
+router.get("/post", authCheck, (req,res) => {
     res.render("post", {user: req.user});
 })
 

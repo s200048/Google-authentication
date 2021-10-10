@@ -63,7 +63,7 @@ app.use("/profile", profileRoute);
 //Home page
 app.get("/", (req,res) => {
     res.render("index", {user: req.user});
-    // console.log(req.session);
+    console.log(req.session);
     // console.log(req.originalUrl);
     // console.log(req.session.passport.user);
     // console.log(passport.user);//undefined

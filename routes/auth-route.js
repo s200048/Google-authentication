@@ -17,7 +17,14 @@ router.get("/login", (req,res) => {
 
 router.post("/login", passport.authenticate("local", {failureRedirect: "/auth/login", 
     failureFlash: "Wrong email or password." }), (req,res) => {
-        res.redirect("/profile");
+        // 想知未login 之前係想去邊(local stragety)
+        if(req.session.returnTo) {
+            let newPath = req.session.returnTo;
+            req.session.returnTo = "";
+            res.redirect(newPath);
+        } else {
+            res.redirect("/profile");
+        }
 })
 
 //Sign up
@@ -73,29 +80,17 @@ router.get("/google",
 
 router.get("/google/redirect", passport.authenticate("google", {failureRedirect: "/login"}), 
     (req,res) => {
-        res.redirect("/profile");
+        if(req.session.returnTo) {
+            let newPath = req.session.returnTo;
+            req.session.returnTo = "";
+            res.redirect(newPath);
+        } else {
+            res.redirect("/profile");
+        }
     }
 );
 
-// post page
-router.get("/post", (req,res) => {
-    res.render("post", {user: req.user});
-})
 
-// router.post("/post", authCheck, async (req,res) => {
-//     let {title, content} = req.body;
-    
-//     let newPost = new Post({title,content: content, author: req.user._id});
-//     try {
-//         await newPost.save();
-//         res.redirect("/profile");
-//     } catch(err) {
-//         console.log(err);
-//         req.flash("error_msg", "Both title and content are required.");
-//         res.redirect("/post");
-//     }
-
-// })
 
 module.exports = router;
 

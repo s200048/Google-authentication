@@ -11,6 +11,16 @@
       <img src="<%= user.thumbnail %>" alt="">
       <p><%= user.name %>'s GoogleID <%= user._id %></p>
       <p><%= user.date %></p>
+      
+      <% for (let i = 0; i < post.length ; i++) { %>
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title"><%= post[i].title %></h5>
+            <p class="card-text"><%= post[i].content %></p>
+            <a href="#" class="btn btn-primary"><%= post[i].date %></a>
+          </div>
+        </div>
+      <% } %>
     <% } %>
 
     <% if (!user.thumbnail) { %>
